@@ -2,8 +2,9 @@ package maintain
 
 import (
 	"context"
-	"github.com/harmonycloud/operator-utils/pkg/util"
 	"strings"
+
+	"github.com/harmonycloud/operator-utils/pkg/util"
 
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -23,7 +24,7 @@ const (
 
 var (
 	// 比如master、slave等
-	LABEL_TYPE    = util.AdaptCompany("middleware.harmonycloud.cn/service-type")
+	LABEL_TYPE = util.AdaptCompany("middleware.harmonycloud.cn/service-type")
 )
 
 /**
@@ -43,7 +44,7 @@ func UpdateServiceSelectorWithArray(conditions []map[string]interface{},
 		podName, exist2 := condition[STATUS_TYPE_POD]
 		status, _ := condition[STATUS_TYPE_STATUS]
 		statusBool := false
-		if !exist1 || !exist2  {
+		if !exist1 || !exist2 {
 			klog.Info("condition format err")
 			return nil
 		}
