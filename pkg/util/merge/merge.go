@@ -284,22 +284,31 @@ func mergeVolumeDevice(original, override corev1.VolumeDevice) corev1.VolumeDevi
 // identifier.
 func Envs(original, override []corev1.EnvVar) []corev1.EnvVar {
 
-	//originalMap := createEnvMap(original)
-	overrideMap := createEnvMap(override)
-	var mergedEnvs []corev1.EnvVar
+	mergedEnvsMap := map[string]corev1.EnvVar{}
 
-	for _, orig := range original {
-		if v, ok := overrideMap[orig.Name]; ok {
-			if v.Value != "" {
-				orig.Value = v.Value
-			}
-			if v.ValueFrom != nil {
-				orig.ValueFrom = v.ValueFrom
-			}
-		}
-		mergedEnvs = append(mergedEnvs, orig)
+	originalMap := createEnvMap(original)
+	overrideMap := createEnvMap(override)
+
+	for k, v := range originalMap {
+		mergedEnvsMap[k] = v
 	}
 
+	for k, v := range overrideMap {
+		if orig, ok := originalMap[k]; ok {
+			mergedEnvsMap[k] = mergeSingleEnv(orig, v)
+		} else {
+			mergedEnvsMap[k] = v
+		}
+	}
+
+	var mergedEnvs []corev1.EnvVar
+	for _, v := range mergedEnvsMap {
+		mergedEnvs = append(mergedEnvs, v)
+	}
+
+	sort.SliceStable(mergedEnvs, func(i, j int) bool {
+		return mergedEnvs[i].Name < mergedEnvs[j].Name
+	})
 	return mergedEnvs
 }
 
